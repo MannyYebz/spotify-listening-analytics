@@ -12,6 +12,25 @@ def get_headers():
     }
 
 
+def print_header(title):
+    print()
+    print("=" * 60)
+    print(f"  {title}")
+    print("=" * 60)
+
+
+def print_table(df, columns, col_widths):
+    header = "  ".join(f"{col:<{col_widths[i]}}" for i, col in enumerate(columns))
+    print(header)
+    print("-" * len(header))
+    for _, row in df.iterrows():
+        line = "  ".join(
+            f"{str(row[col])[:col_widths[i]]:<{col_widths[i]}}"
+            for i, col in enumerate(columns)
+        )
+        print(line)
+
+
 def get_user_profile():
     url = f"{BASE_URL}/me"
     response = requests.get(url, headers=get_headers())
@@ -21,9 +40,12 @@ def get_user_profile():
         return None
 
     data = response.json()
-    print(f"Logged in as: {data['display_name']}")
-    print(f"Account type: {data.get('product', 'unknown')}")
-    print(f"Followers: {data.get('followers', {}).get('total', 0)}")
+
+    print_header("YOUR SPOTIFY PROFILE")
+    print(f"  Name         : {data.get('display_name', 'Unknown')}")
+    print(f"  Account Type : {data.get('product', 'unknown').title()}")
+    print(f"  Followers    : {data.get('followers', {}).get('total', 0)}")
+    print()
     return data
 
 
@@ -41,24 +63,27 @@ def get_top_artists(time_range="medium_term", limit=20):
         return None
 
     data = response.json()
+    label = time_range.replace("_", " ").title()
+    print_header(f"TOP ARTISTS ({label})")
 
-    if not data["items"]:
-        print(f"\nTop Artists ({time_range}): No data yet. Listen to more music and try again.")
+    if not data.get("items"):
+        print("  No data yet. Listen to more music and try again.")
+        print()
         return pd.DataFrame()
 
     artists = []
     for i, artist in enumerate(data["items"]):
         artists.append({
             "rank": i + 1,
-            "name": artist["name"],
-            "genres": ", ".join(artist["genres"]) if artist["genres"] else "N/A",
-            "popularity": artist["popularity"],
-            "followers": artist["followers"]["total"],
+            "name": artist.get("name", "Unknown"),
+            "genres": ", ".join(artist.get("genres", [])[:2]) if artist.get("genres") else "N/A",
+            "popularity": artist.get("popularity", 0),
+            "followers": f"{artist.get('followers', {}).get('total', 0):,}",
         })
 
     df = pd.DataFrame(artists)
-    print(f"\nTop {len(df)} Artists ({time_range}):")
-    print(df[["rank", "name", "genres", "popularity"]].to_string(index=False))
+    print_table(df, ["rank", "name", "genres", "popularity"], [4, 25, 30, 10])
+    print()
     return df
 
 
@@ -76,26 +101,29 @@ def get_top_tracks(time_range="medium_term", limit=20):
         return None
 
     data = response.json()
+    label = time_range.replace("_", " ").title()
+    print_header(f"TOP TRACKS ({label})")
 
-    if not data["items"]:
-        print(f"\nTop Tracks ({time_range}): No data yet. Listen to more music and try again.")
+    if not data.get("items"):
+        print("  No data yet. Listen to more music and try again.")
+        print()
         return pd.DataFrame()
 
     tracks = []
     for i, track in enumerate(data["items"]):
         tracks.append({
             "rank": i + 1,
-            "name": track["name"],
-            "artist": ", ".join([a["name"] for a in track["artists"]]),
-            "album": track["album"]["name"],
-            "popularity": track["popularity"],
-            "duration_min": round(track["duration_ms"] / 60000, 2),
-            "track_id": track["id"],
+            "name": track.get("name", "Unknown"),
+            "artist": ", ".join([a.get("name", "Unknown") for a in track.get("artists", [])]),
+            "album": track.get("album", {}).get("name", "Unknown"),
+            "popularity": track.get("popularity", 0),
+            "duration_min": round(track.get("duration_ms", 0) / 60000, 2),
+            "track_id": track.get("id", ""),
         })
 
     df = pd.DataFrame(tracks)
-    print(f"\nTop {len(df)} Tracks ({time_range}):")
-    print(df[["rank", "name", "artist", "popularity"]].to_string(index=False))
+    print_table(df, ["rank", "name", "artist", "popularity"], [4, 30, 25, 10])
+    print()
     return df
 
 
@@ -110,34 +138,37 @@ def get_recently_played(limit=50):
         return None
 
     data = response.json()
+    print_header("RECENTLY PLAYED")
 
-    if not data["items"]:
-        print("\nRecently Played: No listening history found yet.")
+    if not data.get("items"):
+        print("  No listening history found yet.")
+        print()
         return pd.DataFrame()
 
     tracks = []
     for item in data["items"]:
-        track = item["track"]
+        track = item.get("track", {})
         tracks.append({
-            "played_at": item["played_at"],
-            "name": track["name"],
-            "artist": ", ".join([a["name"] for a in track["artists"]]),
-            "album": track["album"]["name"],
-            "duration_min": round(track["duration_ms"] / 60000, 2),
-            "track_id": track["id"],
+            "played_at": item.get("played_at", ""),
+            "name": track.get("name", "Unknown"),
+            "artist": ", ".join([a.get("name", "Unknown") for a in track.get("artists", [])]),
+            "album": track.get("album", {}).get("name", "Unknown"),
+            "duration_min": round(track.get("duration_ms", 0) / 60000, 2),
+            "track_id": track.get("id", ""),
         })
 
     df = pd.DataFrame(tracks)
-    df["played_at"] = pd.to_datetime(df["played_at"])
-    print(f"\nLast {len(df)} Recently Played Tracks:")
-    print(df[["played_at", "name", "artist"]].head(10).to_string(index=False))
+    df["played_at"] = (
+    pd.to_datetime(df["played_at"]).dt.tz_convert("America/New_York").dt.strftime("%b %d  %I:%M %p"))
+    print_table(df.head(10), ["played_at", "name", "artist"], [16, 30, 25])
+    print()
     return df
 
 
 if __name__ == "__main__":
-    print("=" * 50)
-    print("FETCHING YOUR SPOTIFY DATA")
-    print("=" * 50)
+    print()
+    print("  SPOTIFY LISTENING PROFILE DASHBOARD")
+    print("  ====================================")
 
     get_user_profile()
     get_top_artists("short_term", 20)
