@@ -2,14 +2,13 @@
 
 # 🎵 Spotify Listening Profile Dashboard
 
-**Analyze your Spotify listening habits using Python and the Spotify Web API**
+**Analyze and visualize your Spotify listening habits using Python and the Spotify Web API**
 
-Built to learn REST APIs, OAuth 2.0 authentication, and data analysis with real-world user data.
+A data analytics project that collects personal listening data from Spotify, transforms it into analysis-ready datasets, and presents the results through tables and visualizations.
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue)
 ![Spotify API](https://img.shields.io/badge/API-Spotify-green)
-![OAuth 2.0](https://img.shields.io/badge/Auth-OAuth%202.0-orange)
-![Status](https://img.shields.io/badge/Status-Active-success)
+![Data Analytics](https://img.shields.io/badge/Focus-Data%20Analytics-orange)
 
 </div>
 
@@ -17,37 +16,44 @@ Built to learn REST APIs, OAuth 2.0 authentication, and data analysis with real-
 
 ## 📖 Overview
 
-Music streaming platforms generate a large amount of behavioral data. This project demonstrates how that data can be collected, processed, and analyzed using Python.
+Streaming platforms generate large amounts of behavioral data that can be used to uncover trends and patterns in user activity. This project uses the Spotify Web API to collect listening data and transform it into meaningful summaries and visual reports.
 
-After authenticating with Spotify, the application retrieves your listening information and presents it in structured tables, making it easy to identify trends in your music preferences.
+After authenticating with Spotify, the application retrieves listening history, favorite artists, top tracks, and recent activity, then presents the results through structured tables and charts.
 
 ---
 
-## ✨ Current Features
+## ✨ Features
 
-* 🔐 Secure authentication through Spotify OAuth 2.0
-* 🎤 Retrieve top artists across multiple time ranges
-* 🎵 Retrieve top tracks across multiple time ranges
-* 🕒 Access recently played listening history
-* 📊 Display results in organized terminal-based data tables
+* 🔐 Authenticate securely with Spotify using OAuth 2.0
+* 🎤 Retrieve top artists across short-, medium-, and long-term periods
+* 🎵 Retrieve top tracks across multiple time horizons
+* 🕒 Collect recently played listening history
+* 📊 Display results as formatted terminal-based tables
+* 📈 Generate visualizations and save them to the `/charts` folder
+* 🔄 Transform raw API responses into analysis-ready datasets
 
-### 🚀 Planned Enhancements
+---
 
-* Interactive charts and visualizations
-* Listening trend analysis over time
-* Genre and artist diversity metrics
-* Exportable reports and dashboards
+## 📊 Example Insights
+
+The dashboard can help answer questions such as:
+
+* Which artists dominate my listening habits?
+* How do my favorite tracks change over time?
+* Which artists consistently appear across different time periods?
+* What listening patterns are visible in my recent activity?
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Category           | Tools           |
+| Category           | Technology      |
 | ------------------ | --------------- |
-| Language           | Python 3.12+    |
-| API                | Spotify Web API |
+| Programming        | Python 3.12     |
+| API Integration    | Spotify Web API |
 | Authentication     | OAuth 2.0       |
-| Data Processing    | Pandas          |
+| Data Analysis      | Pandas          |
+| Visualization      | Matplotlib      |
 | Configuration      | Python-dotenv   |
 | Package Management | uv              |
 
@@ -57,16 +63,16 @@ After authenticating with Spotify, the application retrieves your listening info
 
 Before getting started, ensure you have:
 
-* Python 3.12 or newer
-* A Spotify Premium account
-* A Spotify Developer application
-* The uv package manager
+* Python 3.12+
+* Spotify Premium Account
+* Spotify Developer Application
+* uv Package Manager
 
 ---
 
-## ⚡ Install uv
+## ⚡ Step 1: Install uv
 
-This project uses **uv** for dependency management and virtual environments.
+uv is a modern Python package manager that simplifies dependency and virtual environment management.
 
 ### Windows (PowerShell)
 
@@ -80,7 +86,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Verify the installation:
+Verify installation:
 
 ```bash
 uv --version
@@ -88,30 +94,28 @@ uv --version
 
 ---
 
-## 🎧 Create a Spotify Developer Application
+## 🎧 Step 2: Create a Spotify Developer Application
 
-To access Spotify listening data, you will need your own API credentials.
-
-### Steps
+Spotify API access requires application credentials.
 
 1. Visit https://developer.spotify.com
 2. Sign in with your Spotify account
-3. Open the Dashboard and select **Create App**
+3. Open **Dashboard** → **Create App**
 4. Configure the application:
 
-   * **App Name:** Any name you choose
-   * **Description:** Any description
+   * **App Name:** Any name
+   * **App Description:** Any description
    * **Redirect URI:** `http://127.0.0.1:9090`
    * Enable **Web API**
 5. Save the application
 6. Copy your **Client ID**
-7. Reveal and copy your **Client Secret**
+7. Copy your **Client Secret**
 
-> 💡 These credentials allow the application to securely access your Spotify data.
+> These credentials are required for OAuth authentication.
 
 ---
 
-## 📦 Installation
+## 📦 Step 3: Clone and Set Up the Project
 
 Clone the repository:
 
@@ -120,7 +124,7 @@ git clone https://github.com/MannyYebz/spotify-listening-analytics.git
 cd spotify-listening-analytics
 ```
 
-Install project dependencies:
+Install dependencies:
 
 ```bash
 uv sync
@@ -128,9 +132,9 @@ uv sync
 
 ---
 
-## ⚙️ Configuration
+## 🔑 Step 4: Add Your Credentials
 
-Create a `.env` file in the project root directory:
+Create a `.env` file in the project root:
 
 ```bash
 touch .env
@@ -148,56 +152,59 @@ SPOTIFY_REDIRECT_URI=http://127.0.0.1:9090
 
 ## ▶️ Running the Project
 
-Launch the application:
+Run the application:
 
 ```bash
 uv run main.py
 ```
 
-The first time you run the project, a browser window will open asking you to authorize access to your Spotify account.
-
-Once authenticated, the application will retrieve and display:
-
-* Your top artists
-* Your top tracks
-* Your recently played songs
+The first time you run the project, a browser window will open requesting authorization to access your Spotify data.
 
 ---
 
-## 📈 Example Analysis Questions
+## 📂 Output
 
-This project can help answer questions such as:
+### Terminal Reports
 
-* Which artists do I listen to most frequently?
-* How have my listening preferences changed over time?
-* What songs have dominated my recent listening history?
-* Which artists consistently appear across multiple time periods?
+* Top Artists
+* Top Tracks
+* Recently Played Tracks
 
----
+### Visual Reports
 
-## 🎯 Learning Outcomes
+Generated charts are automatically saved to:
 
-This project demonstrates practical experience with:
+```text
+/charts
+```
 
-* REST API integration
-* OAuth 2.0 authentication flows
-* Secure credential management
-* Data collection and transformation
-* Working with JSON API responses
-* Exploratory data analysis in Python
+These visualizations provide a quick overview of listening trends and preferences.
 
 ---
 
-## 🔮 Future Development
+## 🎯 Skills Demonstrated
 
-Planned improvements include:
+This project showcases experience with:
 
-* Data visualization with Matplotlib and Plotly
-* Listening behavior dashboards
-* Genre distribution analysis
-* Playlist analytics
+* API Integration
+* OAuth 2.0 Authentication
+* Data Collection
+* Data Transformation
+* Exploratory Data Analysis (EDA)
+* Data Visualization
+* Working with JSON Data
+* Python Analytics Workflows
+
+---
+
+## 🚀 Future Improvements
+
+* Interactive dashboards with Streamlit
+* Genre-level listening analysis
 * Historical trend tracking
-* Exporting results to CSV and Excel
+* Automated reporting
+* CSV and Excel exports
+* Recommendation and similarity analysis
 
 ---
 
@@ -209,6 +216,6 @@ This project is intended for educational and portfolio purposes. Spotify data re
 
 <div align="center">
 
-**Built with Python, APIs, and a love of music analytics 🎵**
+**Built with Python, APIs, and a passion for data analytics 🎵📊**
 
 </div>
