@@ -158,6 +158,7 @@ def get_recently_played(limit=50):
         })
 
     df = pd.DataFrame(tracks)
+    df["played_at_utc"] = df["played_at"]
     df["played_at"] = (
     pd.to_datetime(df["played_at"]).dt.tz_convert("America/New_York").dt.strftime("%b %d  %I:%M %p"))
     print_table(df.head(10), ["played_at", "name", "artist"], [16, 30, 25])

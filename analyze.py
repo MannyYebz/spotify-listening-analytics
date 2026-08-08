@@ -23,7 +23,7 @@ SPOTIFY_GREEN = "#1DB954"
 ACCENT = "#ffffff"
 
 
-def plot_top_artists(df):
+def plot_top_artists(df, output_path="charts/top_artists.png", title="Your Top Artists"):
     if df is None or df.empty:
         print("  Top artists: no data yet.")
         return
@@ -59,7 +59,7 @@ def plot_top_artists(df):
             color="#888888",
         )
 
-    ax.set_title("Your Top Artists", fontsize=20, fontweight="bold",
+    ax.set_title(title, fontsize=20, fontweight="bold",
                  color=ACCENT, pad=20)
     ax.set_xlim(0, 13)
     ax.xaxis.set_visible(False)
@@ -69,13 +69,13 @@ def plot_top_artists(df):
     ax.tick_params(axis="y", labelsize=12)
 
     plt.tight_layout()
-    plt.savefig("charts/top_artists.png", dpi=150,
+    plt.savefig(output_path, dpi=150,
                 bbox_inches="tight", facecolor="#0d0d0d")
-    print("  Saved: charts/top_artists.png")
+    print(f"  Saved: {output_path}")
     plt.show()
 
 
-def plot_top_tracks(df):
+def plot_top_tracks(df, output_path="charts/top_tracks.png", title="Your Top Tracks"):
     if df is None or df.empty:
         print("  Top tracks: no data yet.")
         return
@@ -112,7 +112,7 @@ def plot_top_tracks(df):
             color="#888888",
         )
 
-    ax.set_title("Your Top Tracks", fontsize=20, fontweight="bold",
+    ax.set_title(title, fontsize=20, fontweight="bold",
                  color=ACCENT, pad=20)
     ax.set_xlim(0, 13)
     ax.xaxis.set_visible(False)
@@ -122,13 +122,17 @@ def plot_top_tracks(df):
     ax.tick_params(axis="y", labelsize=10)
 
     plt.tight_layout()
-    plt.savefig("charts/top_tracks.png", dpi=150,
+    plt.savefig(output_path, dpi=150,
                 bbox_inches="tight", facecolor="#0d0d0d")
-    print("  Saved: charts/top_tracks.png")
+    print(f"  Saved: {output_path}")
     plt.show()
 
 
-def plot_listening_hours(df):
+def plot_listening_hours(
+    df,
+    output_path="charts/listening_hours.png",
+    title="When Do You Listen to Music?",
+):
     if df is None or df.empty:
         print("  Listening hours: no data yet.")
         return
@@ -175,7 +179,7 @@ def plot_listening_hours(df):
     ax.set_xticks(range(24))
     ax.set_xticklabels(time_labels, rotation=45, ha="right", fontsize=9)
     ax.set_ylabel("Tracks Played", fontsize=11, labelpad=10)
-    ax.set_title("When Do You Listen to Music?", fontsize=20,
+    ax.set_title(title, fontsize=20,
                  fontweight="bold", color=ACCENT, pad=20)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -189,13 +193,17 @@ def plot_listening_hours(df):
             ha="right", va="top", color=SPOTIFY_GREEN)
 
     plt.tight_layout()
-    plt.savefig("charts/listening_hours.png", dpi=150,
+    plt.savefig(output_path, dpi=150,
                 bbox_inches="tight", facecolor="#0d0d0d")
-    print("  Saved: charts/listening_hours.png")
+    print(f"  Saved: {output_path}")
     plt.show()
 
 
-def plot_most_played_artists(df):
+def plot_most_played_artists(
+    df,
+    output_path="charts/most_played_artists.png",
+    title="Most Played Artists Recently",
+):
     if df is None or df.empty:
         print("  Most played artists: no data yet.")
         return
@@ -232,7 +240,7 @@ def plot_most_played_artists(df):
             va="center", fontsize=10, color="#888888",
         )
 
-    ax.set_title("Most Played Artists Recently", fontsize=20,
+    ax.set_title(title, fontsize=20,
                  fontweight="bold", color=ACCENT, pad=20)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -241,9 +249,9 @@ def plot_most_played_artists(df):
     ax.tick_params(axis="y", labelsize=12)
 
     plt.tight_layout()
-    plt.savefig("charts/most_played_artists.png", dpi=150,
+    plt.savefig(output_path, dpi=150,
                 bbox_inches="tight", facecolor="#0d0d0d")
-    print("  Saved: charts/most_played_artists.png")
+    print(f"  Saved: {output_path}")
     plt.show()
 
 

@@ -11,3 +11,10 @@ wheels/
 
 .env
 .token_cache.json
+
+# Personal Spotify listening data and account exports
+analytics_history/*.csv
+recent_history/*.csv
+*.zip
+Streaming_History_Audio*.json
+endsong*.json
