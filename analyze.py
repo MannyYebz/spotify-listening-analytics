@@ -138,14 +138,27 @@ def plot_listening_hours(
         return
 
     df = df.copy()
+    # Recent API data may use a local display value ("Aug 07  1:22 AM"),
+    # while saved history uses ISO 8601. Spotify's ISO values can mix entries
+    # with and without fractional seconds, so parse each value independently.
     df["hour"] = pd.to_datetime(
         df["played_at"], format="%b %d  %I:%M %p", errors="coerce"
     ).dt.hour
+    missing_hours = df["hour"].isna()
+    if missing_hours.any():
+        iso_timestamps = pd.to_datetime(
+            df.loc[missing_hours, "played_at"],
+            format="mixed",
+            utc=True,
+            errors="coerce",
+        )
+        df.loc[missing_hours, "hour"] = (
+            iso_timestamps.dt.tz_convert("America/New_York").dt.hour
+        )
 
     if df["hour"].isna().all():
-        df["hour"] = pd.to_datetime(
-            df["played_at"], utc=True
-        ).dt.tz_convert("America/New_York").dt.hour
+        print("  Listening hours: no valid timestamps found.")
+        return
 
     hour_counts = df["hour"].value_counts().reindex(range(24), fill_value=0)
 
@@ -196,6 +209,77 @@ def plot_listening_hours(
     plt.savefig(output_path, dpi=150,
                 bbox_inches="tight", facecolor="#0d0d0d")
     print(f"  Saved: {output_path}")
+    plt.show()
+
+
+def plot_time_of_day(
+    df,
+    output_path="charts/time_of_day.png",
+    title="When Do You Listen Most?",
+):
+    """Plot listening time split across broad parts of the day."""
+    if df is None or df.empty:
+        print("  Time of day: no data yet.")
+        return
+
+    timestamp_column = "played_at_utc" if "played_at_utc" in df.columns else "played_at"
+    timestamps = pd.to_datetime(df[timestamp_column], utc=True, errors="coerce")
+    valid = timestamps.notna()
+    if not valid.any():
+        print("  Time of day: no valid timestamps found.")
+        return
+
+    local_hours = timestamps[valid].dt.tz_convert("America/New_York").dt.hour
+    durations = pd.to_numeric(
+        df.loc[valid, "duration_min"], errors="coerce"
+    ).fillna(0)
+
+    periods = pd.cut(
+        local_hours,
+        bins=[-1, 5, 11, 17, 21, 23],
+        labels=["Late Night", "Morning", "Afternoon", "Evening", "Night"],
+    )
+    period_order = ["Morning", "Afternoon", "Evening", "Night", "Late Night"]
+    listening_minutes = (
+        durations.groupby(periods, observed=False).sum().reindex(period_order, fill_value=0)
+    )
+    total_minutes = listening_minutes.sum()
+    percentages = (
+        listening_minutes / total_minutes * 100
+        if total_minutes > 0
+        else listening_minutes
+    )
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    fig.patch.set_facecolor("#0d0d0d")
+    colors = [SPOTIFY_GREEN if value == listening_minutes.max() else "#555555"
+              for value in listening_minutes]
+    bars = ax.bar(period_order, listening_minutes.values / 60, color=colors, width=0.65)
+
+    for bar, percentage in zip(bars, percentages):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height(),
+            f"{bar.get_height():.1f} hrs\n{percentage:.1f}%",
+            ha="center", va="bottom", fontsize=10, color="#cccccc",
+        )
+
+    peak_period = listening_minutes.idxmax()
+    ax.set_title(title, fontsize=20, fontweight="bold", color=ACCENT, pad=20)
+    ax.set_ylabel("Listening Time (Hours)", fontsize=11, labelpad=10)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(True)
+    ax.margins(y=0.2)
+    ax.text(
+        0.98, 0.95, f"Most active: {peak_period}",
+        transform=ax.transAxes, ha="right", va="top", color=SPOTIFY_GREEN,
+    )
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor="#0d0d0d")
+    print(f"  Saved: {output_path} (most active: {peak_period})")
     plt.show()
 
 

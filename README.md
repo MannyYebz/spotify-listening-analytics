@@ -30,6 +30,7 @@ After authenticating with Spotify, the application retrieves listening history, 
 * 🕒 Collect recently played listening history
 * 📊 Display results as formatted terminal-based tables
 * 📈 Generate visualizations and save them to the `/charts` folder
+* 🌅 Compare listening time across morning, afternoon, evening, and night
 * 🔄 Transform raw API responses into analysis-ready datasets
 
 ---
